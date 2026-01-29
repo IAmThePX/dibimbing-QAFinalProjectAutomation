@@ -1,0 +1,46 @@
+name: CI - Katalon Automation
+
+on:
+  push:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  katalon-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+
+      - name: Download Katalon Runtime Engine
+        run: |
+          wget -q https://download.katalon.com/9.3.0/Katalon_Studio_Engine_Linux_64-9.3.0.tar.gz
+          tar -xzf Katalon_Studio_Engine_Linux_64-9.3.0.tar.gz
+
+      - name: Run Katalon Test Suite
+        run: |
+          ./Katalon_Studio_Engine_Linux_64-9.3.0/katalonc \
+            -noSplash \
+            -runMode=console \
+            -projectPath="$GITHUB_WORKSPACE/your_project.prj" \
+            -testSuitePath="Test Suites/E2E/TS_E2E_API_Employee_Training" \
+            -executionProfile="default" \
+            -browserType="Chrome" \
+            -apiKey="${{ secrets.KATALON_API_KEY }}"
+
+      - name: Upload Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: katalon-report
+          path: Reports/
