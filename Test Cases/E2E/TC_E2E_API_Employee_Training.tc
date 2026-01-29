@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC_E2E_API_Employee_Training</name>
+   <tag></tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>93803a44-c2a9-4438-8159-b03017d2f97e</testCaseGuid>
+</TestCaseEntity>

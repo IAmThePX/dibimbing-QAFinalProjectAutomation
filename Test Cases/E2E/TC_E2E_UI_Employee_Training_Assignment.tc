@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>TC_E2E_UI_Employee_Training_Assignment</name>
+   <tag></tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>63ec2a20-8e6d-4afb-a17f-44fc34fa0eff</testCaseGuid>
+</TestCaseEntity>

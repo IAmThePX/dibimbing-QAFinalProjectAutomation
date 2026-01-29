@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>input-deadline</name>
+   <tag></tag>
+   <elementGuidId>be2e6cb8-8e16-49ba-a948-3a75fbf02454</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//div[@class='css-q5aiia']//div[2]//input[1]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//div[@class='css-q5aiia']//div[2]//input[1]</value>
+      <webElementGuid>df8d7712-a949-4255-bdd3-dfcf603d8638</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>
