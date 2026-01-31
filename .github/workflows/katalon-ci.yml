@@ -1,4 +1,4 @@
-name: CI - Katalon UI & API (GraphQL)
+name: CI - Katalon UI & API
 
 on: [push, pull_request, workflow_dispatch]
 
@@ -7,34 +7,44 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '11'
+    - uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: '11'
 
-      - name: Download Katalon
-        run: |
-          wget -q https://download.katalon.com/9.4.0/Katalon_Studio_Linux_64-9.4.0.tar.gz
-          tar -xzf Katalon_Studio_Linux_64-9.4.0.tar.gz
-          chmod +x Katalon_Studio_Linux_64-9.4.0/katalonc
+    - name: Download Katalon Engine
+      run: |
+        wget -q https://download.katalon.com/9.4.0/Katalon_Studio_Engine_Linux_64-9.4.0.tar.gz
+        tar -xzf Katalon_Studio_Engine_Linux_64-9.4.0.tar.gz
+        ls -la
+        find . -maxdepth 3 -type f -name "katalon*"
 
-      - name: Run Katalon
-        continue-on-error: true
-        run: |
-          ./Katalon_Studio_Linux_64-9.4.0/katalonc \
-            -noSplash \
-            -runMode=console \
-            -projectPath="$GITHUB_WORKSPACE/LMS_B2B_QA_Automation-LK.prj" \
-            -testSuitePath="Test Suites/TS_E2E_All.ts" \
-            -browserType="Firefox (headless)" \
-            -reportFolder="Reports"
+    - name: Prepare Katalon
+      run: |
+        find . -type f -name "katalon*" -exec chmod +x {} \;
 
-      - name: Upload Report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: katalon-reports
-          path: Reports/
-          if-no-files-found: ignore
+    - name: Run Katalon Tests
+      continue-on-error: true
+      run: |
+        KATALON_BIN=$(find . -type f -name "katalon*" | head -n 1)
+        echo "Using Katalon binary: $KATALON_BIN"
+
+        # Gunakan sintaks ini supaya tidak error "(headless)"
+        xvfb-run -a $KATALON_BIN \
+          -noSplash \
+          -runMode=console \
+          -projectPath="$GITHUB_WORKSPACE/LMS_B2B_QA_Automation-LK.prj" \
+          -testSuitePath="Test Suites/TS_E2E_All.ts" \
+          -browserType=Firefox \
+          -reportFolder="$GITHUB_WORKSPACE/Reports" \
+          --config -webui.autoUpdateDrivers=true
+
+    - name: Upload Reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: katalon-reports
+        path: Reports/
+        if-no-files-found: ignore
