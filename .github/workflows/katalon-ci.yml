@@ -20,26 +20,21 @@ jobs:
           distribution: temurin
           java-version: '11'
 
-      - name: Install Xvfb
-        run: sudo apt-get update && sudo apt-get install -y xvfb
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y xvfb unzip
 
       - name: Download Katalon Studio Engine
         run: |
-          wget -q https://download.katalon.com/9.4.0/Katalon_Studio_Engine_Linux_64-9.4.0.tar.gz
-          tar -xzf Katalon_Studio_Engine_Linux_64-9.4.0.tar.gz
-          echo "Searching katalon binary:"
-          find . -maxdepth 4 -type f -name "katalon"
-
-      - name: Prepare Katalon binary
-        run: |
-          find . -type f -name "katalon" -exec chmod +x {} \;
+          wget -q https://download.katalon.com/9.4.0/Katalon_Studio_Engine_Linux_64-9.4.0.zip
+          unzip -q Katalon_Studio_Engine_Linux_64-9.4.0.zip -d katalon
+          chmod -R +x katalon/
 
       - name: Run Katalon Tests (Firefox + Xvfb)
         run: |
           export DISPLAY=:99
           Xvfb :99 -screen 0 1920x1080x24 &
 
-          KATALON_BIN=$(find . -type f -name "katalonc" | head -n 1)
+          KATALON_BIN=$(find katalon/ -type f -name "katalonc" | head -n 1)
           echo "Using Katalon binary: $KATALON_BIN"
 
           if [ -z "$KATALON_BIN" ]; then
