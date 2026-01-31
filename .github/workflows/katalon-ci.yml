@@ -8,35 +8,16 @@ on:
 jobs:
   katalon-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Install Xvfb
-        run: sudo apt-get update && sudo apt-get install -y xvfb
-
-      - name: Set up Java 11
-        uses: actions/setup-java@v3
-        with:
-          distribution: temurin
-          java-version: '11'
-
-      - name: Run Katalon Tests
-        uses: depapp/free-katalon-studio-github-actions@v2.8.4
-        with:
-          version: 8.4.0
-          projectPath: ${{ github.workspace }}/LMS_B2B_QA_Automation-LK.prj
-          testSuitePath: "Test Suites/TS_E2E_All"
-          browserType: "Firefox (headless)"   # ✅ harus pakai tanda kutip
-          executionProfile: "default"
-        env:
-          JAVA_HOME: ${{ env.JAVA_HOME }}
-          JAVA_HOME_11_X64: ${{ env.JAVA_HOME }}
-
-      - name: Upload Katalon Report
-        uses: katalon-studio/report-uploader@v0.0.11
-        with:
-          projectPath: ${{ github.workspace }}/LMS_B2B_QA_Automation-LK.prj
-          reportFolder: Reports
+      - name: Run Katalon via Docker
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/project \
+            katalonstudio/katalon \
+            katalon-execute.sh \
+            -browserType=Firefox \
+            -retry=0 \
+            -testSuitePath="Test Suites/TS_E2E_All" \
+            -projectPath="/project/LMS_B2B_QA_Automation-LK.prj"
