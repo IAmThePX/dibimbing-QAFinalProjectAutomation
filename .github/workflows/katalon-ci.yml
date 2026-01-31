@@ -22,9 +22,9 @@ jobs:
           sudo apt-get install -y xvfb firefox
 
       # 3. Download & extract Katalon 9.6 manually
-      - name: Download Katalon 9.6
+      - name: Download Katalon 9.2
         run: |
-          mkdir -p $HOME/.katalon/9.6.0
+          mkdir -p $HOME/.katalon/9.2.0
           cd $HOME/.katalon/9.6.0
           wget -O katalon.tar.gz https://download.katalon.com/9.6.0/Katalon_Studio_Engine_Linux_64-9.6.0.tar.gz
           tar -xzf katalon.tar.gz
