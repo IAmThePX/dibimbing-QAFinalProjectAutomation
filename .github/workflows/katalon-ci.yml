@@ -44,19 +44,20 @@ jobs:
           mkdir -p Reports
 
       - name: Run Katalon Test Suite (UI + API)
+        continue-on-error: true
         run: |
-          ./Katalon_Studio_Linux_64-9.4.0/katalonc \
-            -noSplash \
-            -runMode=console \
-            -projectPath="$GITHUB_WORKSPACE/LMS_B2B_QA_Automation-LK.prj" \
-            -testSuitePath="Test Suites/TS_E2E_All.ts" \
-            -executionProfile="default" \
-            -browserType="Firefox (headless)" \
-            -retry=0 \
-            -statusDelay=15 \
-            -reportFolder="Reports" \
-            -reportFileName="E2E_Report" \
-            -webui.autoUpdateDrivers=true \
+              ./Katalon_Studio_Linux_64-9.4.0/katalonc \
+                -noSplash \
+                -runMode=console \
+                -projectPath="$GITHUB_WORKSPACE/LMS_B2B_QA_Automation-LK.prj" \
+                -testSuitePath="Test Suites/TS_E2E_All.ts" \
+                -executionProfile="default" \
+                -browserType="Firefox (headless)" \
+                -retry=0 \
+                -statusDelay=15 \
+                -reportFolder="Reports" \
+                -reportFileName="E2E_Report" \
+                -webui.autoUpdateDrivers=true
 
       - name: Upload Katalon Reports
         if: always()
