@@ -12,24 +12,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ======================
-      # CHECKOUT
-      # ======================
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ======================
-      # JAVA (KATALON REQUIREMENT)
-      # ======================
       - name: Set up JDK 11
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '11'
 
-      # ======================
-      # INSTALL CHROME
-      # ======================
       - name: Install Google Chrome
         run: |
           sudo apt-get update
@@ -38,56 +29,34 @@ jobs:
           sudo dpkg -i google-chrome-stable_current_amd64.deb || sudo apt-get install -f -y
           google-chrome --version
 
-      # ======================
-      # INSTALL CHROMEDRIVER
-      # ======================
-      - name: Install ChromeDriver
-        run: |
-          CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d. -f1)
-          DRIVER_VERSION=$(curl -s https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_$CHROME_VERSION)
-          wget -q https://storage.googleapis.com/chrome-for-testing-public/$DRIVER_VERSION/linux64/chromedriver-linux64.zip
-          unzip chromedriver-linux64.zip
-          sudo mv chromedriver-linux64/chromedriver /usr/local/bin/chromedriver
-          sudo chmod +x /usr/local/bin/chromedriver
-          chromedriver --version
-
-      # ======================
-      # DOWNLOAD KATALON
-      # ======================
       - name: Download Katalon Studio
         run: |
           wget -q https://download.katalon.com/9.4.0/Katalon_Studio_Linux_64-9.4.0.tar.gz
           tar -xzf Katalon_Studio_Linux_64-9.4.0.tar.gz
-          
-      - name: Debug Katalon folder
+          chmod +x Katalon_Studio_Linux_64-9.4.0/katalonc
+
+      - name: Verify project files
         run: |
           ls -la
-          ls -la Katalon_Studio_Linux_64-9.4.0
-          ls -la Katalon_Studio_Linux_64-9.4.0/Katalon_Studio
-      # ======================
-      # RUN TEST SUITE
-      # ======================
+          ls *.prj
+          ls "Test Suites"
+
       - name: Run Katalon Test Suite (UI + API)
         run: |
-          chmod +x Katalon_Studio_Linux_64-9.4.0/Katalon_Studio/katalonc
-        
           ./Katalon_Studio_Linux_64-9.4.0/katalonc \
+            -noSplash \
             -runMode=console \
             -projectPath="$GITHUB_WORKSPACE/LMS_B2B_QA_Automation-LK.prj" \
-            -testSuitePath="Test Suites/E2E/TS_E2E_All" \
+            -testSuitePath="Test Suites/TS_E2E_All" \
             -executionProfile="default" \
             -browserType="Chrome" \
             -retry=0 \
             -statusDelay=15 \
-            --config \
-            -webui.autoUpdateDrivers=true
-        env:
-          CHROME_BIN: /usr/bin/google-chrome
-          WEBDRIVER_CHROME_DRIVER: /usr/local/bin/chromedriver
+            -reportFolder="Reports" \
+            -reportFileName="E2E_Report" \
+            -webui.autoUpdateDrivers=true \
+            -apiKey="${{ secrets.KATALON_API_KEY }}"
 
-      # ======================
-      # UPLOAD REPORTS
-      # ======================
       - name: Upload Katalon Reports
         if: always()
         uses: actions/upload-artifact@v4
