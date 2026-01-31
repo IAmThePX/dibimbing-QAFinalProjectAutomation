@@ -17,13 +17,16 @@ jobs:
       - name: Poriyaalar Katalon Studio
         uses: Poriyaalar/katalon-studio-github-action@v2.2-beta5
         with:
+          # Versi Katalon Studio yang ingin dijalankan
           version: 9.4.0
+          # Path ke project Katalon
           projectPath: ${{ github.workspace }}/LMS_B2B_QA_Automation-LK.prj
-          args: > 
-            -noSplash 
-            -runMode=console 
-            -projectPath="${{ github.workspace }}/LMS_B2B_QA_Automation-LK.prj" 
-            -testSuitePath="Test Suites/TS_E2E_All" 
-            -browserType=Firefox 
-            -executionProfile=default 
+          # Argumen Katalon CLI
+          args: >
+            -noSplash
+            -runMode=console
+            -projectPath="${{ github.workspace }}/LMS_B2B_QA_Automation-LK.prj"
+            -testSuitePath="Test Suites/TS_E2E_All"
+            -browserType=Firefox
+            -executionProfile=default
             --config -webui.autoUpdateDrivers=true
