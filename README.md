@@ -1,69 +1,101 @@
 # LMS B2B QA Automation (UI & API)
 
-Automated End-to-End testing project for LMS B2B platform using **Katalon Studio**.
-This project covers **UI Automation** and **API Automation (GraphQL)** in a single CI pipeline.
+Automation testing project for **LMS B2B Dibimbing**, covering:
+
+- ✅ UI Automation (Web)
+- ✅ API Automation (GraphQL)
+- ✅ End-to-End Flow (Employee → Program → Assignment)
+- ✅ CI Integration using GitHub Actions & Katalon Studio Engine (Free Edition)
 
 ---
 
-## 🔧 Tech Stack
+## 🧪 Tech Stack
 
-- **Katalon Studio 9.4.0**
-- **Groovy**
-- **GraphQL API**
-- **GitHub Actions (CI)**
-- **Browsers Tested**
-  - ✅ Firefox (stable)
-  - ⚠️ Chrome & Edge (soft freeze issue)
-
----
-
-## 🧪 Test Coverage
-
-### 1️⃣ UI Automation
-End-to-End scenario:
-- Login
-- Create Employee
-- Create Division
-- Create Training Program
-- Add Chapter & Content
-- Assign Employee to Training
-- Verify Assignment on Employee Detail
-
-📌 **Known Issue (Documented):**
-- Soft freeze occurs on **Chrome & Edge** when:
-  - Opening *Assign Employee modal*
-  - Searching employee inside modal
-  - Occasionally on login page (high load)
-- **Firefox does NOT experience soft freeze**, only longer loading time.
-- Therefore, **Firefox is used as the default browser for CI**.
+- **Katalon Studio (Free Edition)**  
+  > Note: CI runs using CLI engine, Free Edition does not require KRE.  
+- **Katalon Studio Engine (CLI)**  
+- **Groovy**  
+- **GraphQL**  
+- **GitHub Actions**  
+- **Browsers**:
+  - Firefox (recommended for CI, headless)
+  - Chrome / Edge for local testing
 
 ---
 
-### 2️⃣ API Automation (GraphQL)
+## 📂 Project Structure
 
-End-to-End API flow:
-- Login
-- Create Employee (dynamic unique data)
-- Create Program
-- Create Chapter
-- Create Content
-- Assign Program to Employee
-- Delete Employee (cleanup)
+.
+├── Test Cases
+│ ├── API
+│ │ └── E2E_API_Employee_Training
+│ └── UI
+│ └── E2E_UI_Employee_Training
+├── Test Suites
+│ └── TS_E2E_All
+├── Object Repository
+│ ├── API
+│ └── UI
+├── Reports
+├── README.md
+└── *.prj
 
-📌 Important Notes:
-- GraphQL `DateTime` **must be ISO 8601 string**
-- API errors previously encountered were **backend input validation issues**, not test case issues
-- Guard assertions are applied for `data != null` to prevent false-negative failures
 
 ---
 
-## ▶️ How to Run Locally
+## 🔁 End-to-End Test Flow
+
+### 🔹 API Flow (GraphQL)
+1. Login
+2. Create Employee (dynamic email)
+3. Create Program (Training)
+4. Create Chapter
+5. Create Content
+6. Assign Program to Employee
+7. Verify assignment
+8. Delete Employee (cleanup)
+
+### 🔹 UI Flow (Web)
+1. Login
+2. Add Employee
+3. Add Division
+4. Create Training Program
+5. Add Chapter & Content
+6. Assign Employee to Training
+7. Verify assignment on Employee detail
+
+---
+
+## ⚠️ Known Issues (IMPORTANT)
+
+### 🧊 Soft Freeze on Chrome & Edge
+Observed **soft-freeze / UI hang** on:
+- Opening **Assign Employee modal**
+- Searching employee in Assign flow
+- Occasionally during Login page load
+
+✔️ **Does NOT occur in Firefox (headless recommended for CI)**
+
+📌 **Root Cause (suspected)**:
+- Frontend overload / heavy JS rendering
+- Browser-specific behavior (Chrome / Edge)
+
+👉 **Recommendation**:
+- Use **Firefox (headless)** for CI execution
+- Chrome & Edge are still valid for local testing
+
+---
+
+## 🚀 Running Tests Locally
 
 ### UI Test
-```bash
-katalonc \
+
+# Run UI tests locally
+$KATALON_BIN \
+  -noSplash \
   -runMode=console \
   -projectPath="LMS_B2B_QA_Automation-LK.prj" \
-  -testSuitePath="Test Suites/TS_E2E_All" \
-  -executionProfile="default" \
-  -browserType="Firefox"
+  -testSuitePath="Test Suites/TS_E2E_All.ts" \
+  -browserType=Firefox \
+  -executionProfile=default \
+  --config -webui.autoUpdateDrivers=true
