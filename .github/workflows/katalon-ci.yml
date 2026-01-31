@@ -1,100 +1,53 @@
-name: CI - Katalon UI & API (GraphQL)
+name: CI - Katalon UI & API
 
 on:
   push:
-    branches: [ main, develop ]
   pull_request:
-    branches: [ main, develop ]
   workflow_dispatch:
 
 jobs:
   katalon-test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
-      # ======================
-      # Checkout
-      # ======================
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ======================
-      # Java (Katalon requirement)
-      # ======================
-      - name: Set up JDK 11
+      - name: Set up Java 11
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: temurin
           java-version: '11'
 
-      # ======================
-      # Install Firefox (lebih stabil dari Chrome)
-      # ======================
-      - name: Install Firefox
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y firefox
-
-      # ======================
-      # Install Xvfb
-      # ======================
-      - name: Install Xvfb
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y xvfb
-
-      # ======================
-      # Download Katalon Engine
-      # ======================
       - name: Download Katalon Studio Engine
         run: |
           wget -q https://download.katalon.com/9.4.0/Katalon_Studio_Engine_Linux_64-9.4.0.tar.gz
           tar -xzf Katalon_Studio_Engine_Linux_64-9.4.0.tar.gz
+          echo "Searching katalon binary:"
+          find . -maxdepth 4 -type f -name "katalon"
 
-      # ======================
-      # Make binary executable (ALL POSSIBILITIES)
-      # ======================
-      - name: Make Katalon binaries executable
+      - name: Prepare Katalon binary
         run: |
-          find . -type f \( -name "katalon" -o -name "katalon-engine" -o -name "katalonc" \) -exec chmod +x {} \;
+          find . -type f -name "katalon" -exec chmod +x {} \;
 
-      # ======================
-      # Locate Katalon binary (WITH GUARD)
-      # ======================
-      - name: Locate Katalon binary
+      - name: Run Katalon Tests
         run: |
-          KATALON_BIN=$(find . -type f \( -name "katalon" -o -name "katalon-engine" -o -name "katalonc" \) | head -n 1)
-
-          if [ -z "$KATALON_BIN" ]; then
-            echo "❌ Katalon binary not found"
-            find . -maxdepth 3 -type f
-            exit 1
-          fi
-
+          KATALON_BIN=$(find . -type f -name "katalon" | head -n 1)
           echo "Using Katalon binary: $KATALON_BIN"
-          echo "KATALON_BIN=$KATALON_BIN" >> $GITHUB_ENV
 
-      # ======================
-      # Run Test Suite (UI + API)
-      # ======================
-      - name: Run Katalon Test Suite
-        run: |
-          xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' \
+          xvfb-run --auto-servernum \
           "$KATALON_BIN" \
             -runMode=console \
             -projectPath="$GITHUB_WORKSPACE/LMS_B2B_QA_Automation-LK.prj" \
             -testSuitePath="Test Suites/TS_E2E_All.ts" \
-            -executionProfile="default" \
             -browserType="Firefox" \
             -reportFolder="Reports"
 
-      # ======================
-      # Upload Reports (Optional)
-      # ======================
       - name: Upload Katalon Reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: katalon-reports
           path: Reports/
-          retention-days: 14
+          if-no-files-found: ignore
