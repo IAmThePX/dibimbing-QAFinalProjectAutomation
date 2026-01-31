@@ -21,7 +21,7 @@ jobs:
           version: 9.4.0
           projectPath: ${{ github.workspace }}/LMS_B2B_QA_Automation-LK.prj
           testSuitePath: "Test Suites/TS_E2E_All"
-          browserType: '"Firefox (headless)"'
+          browserType: "Firefox (headless)"
           executionProfile: "default"
 
       # Upload reports to GitHub Actions
