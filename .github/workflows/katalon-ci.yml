@@ -19,15 +19,19 @@ jobs:
           wget -q https://download.katalon.com/9.4.0/Katalon_Studio_Engine_Linux_64-9.4.0.tar.gz
           tar -xzf Katalon_Studio_Engine_Linux_64-9.4.0.tar.gz
           ls -la
+          find . -maxdepth 3 -type f -name "katalon"
 
       - name: Prepare katalon
         run: |
-          chmod +x Katalon_Studio_Engine_Linux_64-9.4.0/katalon
+          find . -type f -name "katalon" -exec chmod +x {} \;
 
       - name: Run Katalon Tests
         continue-on-error: true
         run: |
-          ./Katalon_Studio_Engine_Linux_64-9.4.0/katalon \
+          KATALON_BIN=$(find . -type f -name "katalon" | head -n 1)
+          echo "Using Katalon binary: $KATALON_BIN"
+      
+          $KATALON_BIN \
             -noSplash \
             -runMode=console \
             -projectPath="$GITHUB_WORKSPACE/LMS_B2B_QA_Automation-LK.prj" \
