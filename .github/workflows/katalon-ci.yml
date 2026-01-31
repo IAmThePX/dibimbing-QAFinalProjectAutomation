@@ -8,22 +8,38 @@ on:
 jobs:
   katalon-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
 
     steps:
+      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Poriyaalar Katalon Studio
-        uses: Poriyaalar/katalon-studio-github-action@v2.2-beta5
+      # 2️⃣ Install Java (Katalon membutuhkan Java 11+)
+      - name: Set up Java
+        uses: actions/setup-java@v3
         with:
-          version: 9.4.0
+          distribution: 'temurin'
+          java-version: '11'
+
+      # 3️⃣ Run Katalon Free Edition (no license required)
+      - name: Run Katalon Tests (Free Edition)
+        uses: depapp/free-katalon-studio-github-actions@v2.8.4
+        with:
+          # Gunakan versi 9.x yang ada
+          version: 9.6.0
+          # Lokasi project Katalon di repo
           projectPath: ${{ github.workspace }}/LMS_B2B_QA_Automation-LK.prj
-          args: >
-            -noSplash
-            -runMode=console
-            -projectPath="${{ github.workspace }}/LMS_B2B_QA_Automation-LK.prj"
-            -testSuitePath="Test Suites/TS_E2E_All"
-            -browserType=Firefox
-            -executionProfile=default
-            --config -webui.autoUpdateDrivers=true
+          # Test suite yang dijalankan
+          testSuitePath: "Test Suites/TS_E2E_All"
+          # Gunakan browser biasa (tidak pakai tanda kurung agar Bash tidak error)
+          browserType: "Firefox"
+          # Profile execution default
+          executionProfile: "default"
+
+      # 4️⃣ Upload test reports ke GitHub Actions
+      - name: Katalon Report Uploader
+        uses: katalon-studio/report-uploader@v0.0.11
+        with:
+          projectPath: ${{ github.workspace }}/LMS_B2B_QA_Automation-LK.prj
+          reportFolder: Reports
