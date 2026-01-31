@@ -36,6 +36,14 @@ jobs:
           sudo apt-get install -y firefox
 
       # ======================
+      # Install Xvfb
+      # ======================
+      - name: Install Xvfb
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+
+      # ======================
       # Download Katalon Engine
       # ======================
       - name: Download Katalon Studio Engine
@@ -71,12 +79,13 @@ jobs:
       # ======================
       - name: Run Katalon Test Suite
         run: |
+          xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' \
           "$KATALON_BIN" \
             -runMode=console \
             -projectPath="$GITHUB_WORKSPACE/LMS_B2B_QA_Automation-LK.prj" \
             -testSuitePath="Test Suites/TS_E2E_All.ts" \
             -executionProfile="default" \
-            -browserType="Firefox (headless)" \
+            -browserType="Firefox" \
             -reportFolder="Reports"
 
       # ======================
