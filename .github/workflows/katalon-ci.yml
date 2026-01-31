@@ -27,11 +27,16 @@ jobs:
           sudo apt-get install -y firefox
           firefox --version
 
-      - name: Download Katalon Studio
+      - name: Download Katalon
         run: |
           wget -q https://download.katalon.com/9.4.0/Katalon_Studio_Linux_64-9.4.0.tar.gz
           tar -xzf Katalon_Studio_Linux_64-9.4.0.tar.gz
-          chmod +x Katalon_Studio_Linux_64-9.4.0/katalonc
+          ls -la
+      
+      - name: Make katalonc executable
+        run: |
+          chmod +x Katalon_*/katalonc
+          ls -la Katalon_*/katalonc
 
       - name: Debug project structure
         run: |
@@ -46,7 +51,7 @@ jobs:
       - name: Run Katalon Test Suite (UI + API)
         continue-on-error: true
         run: |
-          ./Katalon_Studio_Linux_64-9.4.0/katalonc \
+          ./Katalon_*/katalonc \
             -noSplash \
             -runMode=console \
             -projectPath="$GITHUB_WORKSPACE/LMS_B2B_QA_Automation-LK.prj" \
