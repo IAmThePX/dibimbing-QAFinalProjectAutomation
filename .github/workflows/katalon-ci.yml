@@ -16,13 +16,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java (already in Docker, optional)
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '11'
-
-      - name: Run Katalon Tests (Firefox headful)
+      - name: Run Katalon Tests (Firefox headless)
         run: |
           echo "Running Katalon Tests using Docker image katalonstudio/katalon:9.4.0"
 
@@ -30,7 +24,7 @@ jobs:
             -runMode=console \
             -projectPath="$GITHUB_WORKSPACE/LMS_B2B_QA_Automation-LK.prj" \
             -testSuitePath="Test Suites/TS_E2E_All.ts" \
-            -browserType="Firefox" \
+            -browserType="Firefox (headless)" \
             -executionProfile="default" \
             -consoleLog \
             -reportFolder="Reports"
