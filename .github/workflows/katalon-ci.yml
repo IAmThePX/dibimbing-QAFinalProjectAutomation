@@ -30,12 +30,17 @@ jobs:
       - name: Prepare Katalon binary
         run: |
           find . -type f -name "katalon" -exec chmod +x {} \;
-
+          
       - name: Run Katalon Tests
         run: |
-          KATALON_BIN=$(find . -type f -name "katalon" | head -n 1)
+          KATALON_BIN=$(find . -type f -name "katalonc" | head -n 1)
           echo "Using Katalon binary: $KATALON_BIN"
-
+      
+          if [ -z "$KATALON_BIN" ]; then
+            echo "❌ Katalon binary not found"
+            exit 1
+          fi
+      
           xvfb-run --auto-servernum \
           "$KATALON_BIN" \
             -runMode=console \
