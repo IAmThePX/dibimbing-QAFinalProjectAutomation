@@ -21,13 +21,11 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
 
-      - name: Install Google Chrome
+      - name: Install Firefox
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget unzip
-          wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-          sudo dpkg -i google-chrome-stable_current_amd64.deb || sudo apt-get install -f -y
-          google-chrome --version
+          sudo apt-get install -y firefox
+          firefox --version
 
       - name: Download Katalon Studio
         run: |
@@ -49,7 +47,7 @@ jobs:
             -projectPath="$GITHUB_WORKSPACE/LMS_B2B_QA_Automation-LK.prj" \
             -testSuitePath="Test Suites/TS_E2E_All" \
             -executionProfile="default" \
-            -browserType="Chrome" \
+            -browserType="Firefox" \
             -retry=0 \
             -statusDelay=15 \
             -reportFolder="Reports" \
