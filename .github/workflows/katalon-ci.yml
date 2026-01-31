@@ -8,47 +8,25 @@ on:
 jobs:
   katalon-test:
     runs-on: ubuntu-latest
-    container:
-      image: katalonstudio/katalon:9.4.0
-      options: >-
-        --mount type=bind,source=${{ github.workspace }}/.katalon/license,target=/root/.katalon/license
-
     timeout-minutes: 25
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Ensure license folder exists
-        run: |
-          mkdir -p $GITHUB_WORKSPACE/.katalon/license
-          echo "⚡ Make sure your offline license file (.lic) is in .katalon/license/"
-
-      - name: Run Katalon Tests (Firefox headless)
-        id: katalon_run
-        run: |
-          echo "Running Katalon Tests using Docker image katalonstudio/katalon:9.4.0 with offline license"
-
-          katalonc -noSplash \
-            -runMode=console \
-            -projectPath="$GITHUB_WORKSPACE/LMS_B2B_QA_Automation-LK.prj" \
-            -testSuitePath="Test Suites/TS_E2E_All.ts" \
-            -browserType="Firefox (headless)" \
-            -executionProfile="default" \
-            -consoleLog \
-            -reportFolder="Reports"
-        continue-on-error: true  # tetap lanjut upload report meski ada test failures
-
-      - name: Upload Katalon Reports
-        if: always()
-        uses: actions/upload-artifact@v4
+      # Run Katalon tests using Free Katalon Studio Action
+      - name: Free Katalon Studio
+        uses: depapp/free-katalon-studio-github-actions@v2.8.4
         with:
-          name: katalon-reports
-          path: Reports/
-          if-no-files-found: ignore
+          version: 9.4.0
+          projectPath: ${{ github.workspace }}/LMS_B2B_QA_Automation-LK.prj
+          testSuitePath: "Test Suites/TS_E2E_All.ts"
+          browserType: "Firefox (headless)"
+          executionProfile: "default"
 
-      - name: Mark job failed if test failures
-        if: steps.katalon_run.outcome == 'failure'
-        run: |
-          echo "⚠ Some tests failed (exit code 2), marking job as failed."
-          exit 2
+      # Upload reports to GitHub Actions
+      - name: Katalon Report Uploader
+        uses: katalon-studio/report-uploader@v0.0.11
+        with:
+          projectPath: ${{ github.workspace }}/LMS_B2B_QA_Automation-LK.prj
+          reportFolder: Reports
