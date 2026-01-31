@@ -1,66 +1,41 @@
-name: CI - Katalon UI & API (GraphQL)
+name: CI - Katalon UI & API
 
-on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main, develop ]
-  workflow_dispatch:
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
   katalon-test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up JDK 11
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: temurin
           java-version: '11'
 
-      - name: Install Firefox
+      - name: Download Katalon Engine
         run: |
-          sudo apt-get update
-          sudo apt-get install -y firefox
-          firefox --version
-
-      - name: Download Katalon
-        run: |
-          wget -q https://download.katalon.com/9.4.0/Katalon_Studio_Linux_64-9.4.0.tar.gz
-          tar -xzf Katalon_Studio_Linux_64-9.4.0.tar.gz
+          wget -q https://download.katalon.com/9.4.0/Katalon_Studio_Engine_Linux_64-9.4.0.tar.gz
+          tar -xzf Katalon_Studio_Engine_Linux_64-9.4.0.tar.gz
           ls -la
-      
-      - name: Make katalonc executable
-        run: |
-          chmod +x Katalon_*/katalonc
-          ls -la Katalon_*/katalonc
 
-      - name: Debug project structure
+      - name: Prepare katalon
         run: |
-          ls -la
-          find . -type f -name "*.prj"
-          find . -type f -name "*.ts"
+          chmod +x Katalon_Studio_Engine_Linux_64-9.4.0/katalon
 
-      - name: Prepare report folder
-        run: |
-          mkdir -p Reports
-
-      - name: Run Katalon Test Suite (UI + API)
+      - name: Run Katalon Tests
         continue-on-error: true
         run: |
-          ./Katalon_*/katalonc \
+          ./Katalon_Studio_Engine_Linux_64-9.4.0/katalon \
             -noSplash \
             -runMode=console \
             -projectPath="$GITHUB_WORKSPACE/LMS_B2B_QA_Automation-LK.prj" \
             -testSuitePath="Test Suites/TS_E2E_All.ts" \
-            -executionProfile="default" \
             -browserType="Firefox (headless)" \
             -reportFolder="Reports"
-                
-      - name: Upload Katalon Reports
+
+      - name: Upload Reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
