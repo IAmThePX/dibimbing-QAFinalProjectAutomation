@@ -1,7 +1,9 @@
-name: CI - Katalon Automation
+name: CI - Katalon UI & API (GraphQL)
 
 on:
   push:
+    branches: [ main, develop ]
+  pull_request:
     branches: [ main, develop ]
   workflow_dispatch:
 
@@ -10,37 +12,79 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      # ======================
+      # CHECKOUT
+      # ======================
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      # ======================
+      # JAVA (KATALON REQUIREMENT)
+      # ======================
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '11'
 
-      - name: Install Chrome
+      # ======================
+      # INSTALL CHROME
+      # ======================
+      - name: Install Google Chrome
         run: |
           sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
+          sudo apt-get install -y wget unzip
+          wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo dpkg -i google-chrome-stable_current_amd64.deb || sudo apt-get install -f -y
+          google-chrome --version
 
-      - name: Download Katalon Runtime Engine
+      # ======================
+      # INSTALL CHROMEDRIVER
+      # ======================
+      - name: Install ChromeDriver
         run: |
-          wget -q https://download.katalon.com/9.3.0/Katalon_Studio_Engine_Linux_64-9.3.0.tar.gz
-          tar -xzf Katalon_Studio_Engine_Linux_64-9.3.0.tar.gz
+          CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d. -f1)
+          DRIVER_VERSION=$(curl -s https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_$CHROME_VERSION)
+          wget -q https://storage.googleapis.com/chrome-for-testing-public/$DRIVER_VERSION/linux64/chromedriver-linux64.zip
+          unzip chromedriver-linux64.zip
+          sudo mv chromedriver-linux64/chromedriver /usr/local/bin/chromedriver
+          sudo chmod +x /usr/local/bin/chromedriver
+          chromedriver --version
 
-      - name: Run Katalon Test Suite
+      # ======================
+      # DOWNLOAD KATALON
+      # ======================
+      - name: Download Katalon Studio
         run: |
-          ./Katalon_Studio_Engine_Linux_64-9.3.0/katalonc \
-            -noSplash \
+          wget -q https://download.katalon.com/9.4.0/Katalon_Studio_Linux_64-9.4.0.tar.gz
+          tar -xzf Katalon_Studio_Linux_64-9.4.0.tar.gz
+
+      # ======================
+      # RUN TEST SUITE
+      # ======================
+      - name: Run Katalon Test Suite (UI + API)
+        run: |
+          ./Katalon_Studio_Linux_64-9.4.0/katalonc \
             -runMode=console \
-            -projectPath="$GITHUB_WORKSPACE/your_project.prj" \
-            -testSuitePath="Test Suites/E2E/TS_E2E_API_Employee_Training" \
+            -projectPath="$GITHUB_WORKSPACE/LMS_B2B_QA_Automation-LK.prj" \
+            -testSuitePath="Test Suites/E2E/TS_E2E_All" \
             -executionProfile="default" \
             -browserType="Chrome" \
-            -apiKey="${{ secrets.KATALON_API_KEY }}"
+            -retry=0 \
+            -statusDelay=15 \
+            --config \
+            -webui.autoUpdateDrivers=true
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
+          WEBDRIVER_CHROME_DRIVER: /usr/local/bin/chromedriver
 
-      - name: Upload Reports
+      # ======================
+      # UPLOAD REPORTS
+      # ======================
+      - name: Upload Katalon Reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: katalon-report
+          name: katalon-reports
           path: Reports/
+          retention-days: 30
