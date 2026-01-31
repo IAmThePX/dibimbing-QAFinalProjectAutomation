@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v4
 
       # ======================
-      # Setup Java (REQUIRED)
+      # Setup Java (WAJIB)
       # ======================
       - name: Set up JDK 11
         uses: actions/setup-java@v4
@@ -28,7 +28,7 @@ jobs:
           java-version: '11'
 
       # ======================
-      # Install Firefox (Stable for CI)
+      # Install Firefox (STABLE)
       # ======================
       - name: Install Firefox
         run: |
@@ -37,7 +37,7 @@ jobs:
           firefox --version
 
       # ======================
-      # Download Katalon Studio Engine (CLI)
+      # Download Katalon Engine
       # ======================
       - name: Download Katalon Studio Engine
         run: |
@@ -45,19 +45,21 @@ jobs:
           tar -xzf Katalon_Studio_Engine_Linux_64-9.4.0.tar.gz
 
       # ======================
-      # Verify Katalon Binary
+      # Locate Katalon Binary (ANTI ERROR)
       # ======================
-      - name: Verify Katalon binary
+      - name: Locate Katalon binary
+        id: find-katalon
         run: |
-          ls -la
-          find . -type f -name "katalon"
+          KATALON_BIN=$(find . -type f -name "katalon" | head -n 1)
+          echo "KATALON_BIN=$KATALON_BIN" >> $GITHUB_ENV
+          echo "Found Katalon binary at: $KATALON_BIN"
 
       # ======================
-      # Make katalon executable
+      # Make Executable
       # ======================
       - name: Make katalon executable
         run: |
-          chmod +x Katalon_Studio_Engine_Linux_64-9.4.0/katalon
+          chmod +x "$KATALON_BIN"
 
       # ======================
       # Run Test Suite
@@ -65,18 +67,18 @@ jobs:
       - name: Run Katalon Test Suite (UI + API)
         continue-on-error: true
         run: |
-          ./Katalon_Studio_Engine_Linux_64-9.4.0/katalon \
+          "$KATALON_BIN" \
             -noSplash \
             -runMode=console \
             -projectPath="$GITHUB_WORKSPACE/LMS_B2B_QA_Automation-LK.prj" \
             -testSuitePath="Test Suites/TS_E2E_All.ts" \
             -browserType="Firefox (headless)" \
-            -reportFolder="Reports" \
             -retry=0 \
-            -statusDelay=15
+            -statusDelay=15 \
+            -reportFolder="Reports"
 
       # ======================
-      # Upload Reports (ALWAYS)
+      # Upload Reports (SELALU)
       # ======================
       - name: Upload Katalon Reports
         if: always()
