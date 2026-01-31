@@ -1,4 +1,4 @@
-name: CI - Katalon UI & API
+name: CI - Katalon UI & API (Headless Linux)
 
 on:
   push:
@@ -8,16 +8,43 @@ on:
 jobs:
   katalon-test:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+    timeout-minutes: 40
 
-      - name: Run Katalon via Docker
+    steps:
+      # 1. Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Install dependencies: xvfb for headless GUI
+      - name: Install dependencies
         run: |
-          docker run --rm \
-            -v ${{ github.workspace }}:/project \
-            katalonstudio/katalon \
-            katalon-execute.sh \
-            -browserType=Firefox \
-            -retry=0 \
+          sudo apt-get update
+          sudo apt-get install -y xvfb firefox
+
+      # 3. Download & extract Katalon 9.6 manually
+      - name: Download Katalon 9.6
+        run: |
+          mkdir -p $HOME/.katalon/9.6.0
+          cd $HOME/.katalon/9.6.0
+          wget -O katalon.tar.gz https://download.katalon.com/9.6.0/Katalon_Studio_Engine_Linux_64-9.6.0.tar.gz
+          tar -xzf katalon.tar.gz
+          chmod +x Katalon_Studio_Engine_Linux_64-9.6.0/katalonc
+
+      # 4. Run Katalon tests headless using xvfb-run
+      - name: Run Katalon Tests (Headless)
+        run: |
+          xvfb-run -a $HOME/.katalon/9.6.0/Katalon_Studio_Engine_Linux_64-9.6.0/katalonc \
+            -noSplash \
+            -runMode="console" \
+            -projectPath="${{ github.workspace }}/LMS_B2B_QA_Automation-LK.prj" \
             -testSuitePath="Test Suites/TS_E2E_All" \
-            -projectPath="/project/LMS_B2B_QA_Automation-LK.prj"
+            -browserType=Firefox \
+            -executionProfile=default \
+            --config -webui.autoUpdateDrivers=true
+
+      # 5. Optional: Upload reports
+      - name: Upload Katalon Reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: katalon-reports
+          path: ${{ github.workspace }}/LMS_B2B_QA_Automation-LK.prj/Reports
