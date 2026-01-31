@@ -8,42 +8,25 @@ on:
 jobs:
   katalon-test:
     runs-on: ubuntu-latest
+    container:
+      image: katalonstudio/katalon:9.4.0
     timeout-minutes: 20
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java 11
+      - name: Set up Java (already in Docker, optional)
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '11'
 
-      - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y xvfb unzip
-
-      - name: Download Katalon Studio Engine
+      - name: Run Katalon Tests (Firefox headful)
         run: |
-          wget --show-progress -O Katalon_Studio_Engine_Linux_64-9.4.0.zip https://download.katalon.com/9.4.0/Katalon_Studio_Engine_Linux_64-9.4.0.zip
-          unzip -q Katalon_Studio_Engine_Linux_64-9.4.0.zip -d katalon || { echo "❌ Unzip failed"; exit 1; }
-          chmod -R +x katalon/
+          echo "Running Katalon Tests using Docker image katalonstudio/katalon:9.4.0"
 
-      - name: Run Katalon Tests (Firefox + Xvfb)
-        run: |
-          export DISPLAY=:99
-          Xvfb :99 -screen 0 1920x1080x24 &
-
-          KATALON_BIN=$(find katalon/ -type f -name "katalonc" | head -n 1)
-          echo "Using Katalon binary: $KATALON_BIN"
-
-          if [ -z "$KATALON_BIN" ]; then
-            echo "❌ Katalon binary not found"
-            exit 1
-          fi
-
-          "$KATALON_BIN" \
-            -noSplash \
+          katalonc -noSplash \
             -runMode=console \
             -projectPath="$GITHUB_WORKSPACE/LMS_B2B_QA_Automation-LK.prj" \
             -testSuitePath="Test Suites/TS_E2E_All.ts" \
