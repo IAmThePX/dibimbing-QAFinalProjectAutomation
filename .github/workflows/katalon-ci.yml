@@ -33,7 +33,7 @@ jobs:
       # 4. Run Katalon tests headless using xvfb-run
       - name: Run Katalon Tests (Headless)
         run: |
-          xvfb-run -a $HOME/.katalon/9.10.0/Katalon_Studio_Engine_Linux_64-10.0.0/katalonc \
+          xvfb-run -a $HOME/.katalon/10.0.0/Katalon_Studio_Engine_Linux_64-10.0.0/katalonc \
             -noSplash \
             -runMode="console" \
             -projectPath="${{ github.workspace }}/LMS_B2B_QA_Automation-LK.prj" \
