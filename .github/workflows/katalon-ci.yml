@@ -10,13 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: katalonstudio/katalon:9.4.0
-    timeout-minutes: 20
+    timeout-minutes: 25
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Run Katalon Tests (Firefox headless)
+        id: katalon_run
         run: |
           echo "Running Katalon Tests using Docker image katalonstudio/katalon:9.4.0"
 
@@ -28,6 +29,7 @@ jobs:
             -executionProfile="default" \
             -consoleLog \
             -reportFolder="Reports"
+        continue-on-error: true  # biar workflow lanjut upload report meski test gagal
 
       - name: Upload Katalon Reports
         if: always()
@@ -36,3 +38,9 @@ jobs:
           name: katalon-reports
           path: Reports/
           if-no-files-found: ignore
+
+      - name: Set job status based on test results
+        if: steps.katalon_run.outcome == 'failure'
+        run: |
+          echo "⚠ Some tests failed (exit code 2), marking job as failed."
+          exit 2
