@@ -21,21 +21,19 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
+          
+      # 2️⃣ Install Xvfb
+      - name: Install Xvfb for headless display
+        run: sudo apt-get install -y xvfb
 
       # 3️⃣ Run Katalon Free Edition (no license required)
-      - name: Run Katalon Tests (Free Edition)
-        uses: depapp/free-katalon-studio-github-actions@v2.8.4
-        with:
-          # Gunakan versi 9.x yang ada
-          version: 9.6.0
-          # Lokasi project Katalon di repo
-          projectPath: ${{ github.workspace }}/LMS_B2B_QA_Automation-LK.prj
-          # Test suite yang dijalankan
-          testSuitePath: "Test Suites/TS_E2E_All"
-          # Gunakan browser biasa (tidak pakai tanda kurung agar Bash tidak error)
-          browserType: "Firefox"
-          # Profile execution default
-          executionProfile: "default"
+      - name: Run Katalon Tests
+        run: xvfb-run -a katalonc -noSplash -runMode="console" \
+              -projectPath="${{ github.workspace }}/LMS_B2B_QA_Automation-LK.prj" \
+              -testSuitePath="Test Suites/TS_E2E_All" \
+              -browserType=Firefox \
+              -executionProfile=default \
+              --config -webui.autoUpdateDrivers=true
 
       # 4️⃣ Upload test reports ke GitHub Actions
       - name: Katalon Report Uploader
