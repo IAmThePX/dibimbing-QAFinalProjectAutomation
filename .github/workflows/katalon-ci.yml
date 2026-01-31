@@ -22,18 +22,18 @@ jobs:
           sudo apt-get install -y xvfb firefox
 
       # 3. Download & extract Katalon 9.6 manually
-      - name: Download Katalon 10.0.0
+      - name: Download Katalon 9.0
         run: |
-          mkdir -p $HOME/.katalon/10.0.0
-          cd $HOME/.katalon/10.0.0
-          wget -O katalon.tar.gz https://download.katalon.com/10.0.0/Katalon_Studio_Engine_Linux_64-10.0.0.tar.gz
+          mkdir -p $HOME/.katalon/9.0.0
+          cd $HOME/.katalon/9.0.0
+          wget -O katalon.tar.gz https://download.katalon.com/9.0.0/Katalon_Studio_Engine_Linux_64-9.0.0.tar.gz
           tar -xzf katalon.tar.gz
-          chmod +x Katalon_Studio_Engine_Linux_64-10.0.0/katalonc
+          chmod +x Katalon_Studio_Engine_Linux_64-9.0.0/katalonc
 
       # 4. Run Katalon tests headless using xvfb-run
       - name: Run Katalon Tests (Headless)
         run: |
-          xvfb-run -a $HOME/.katalon/10.0.0/Katalon_Studio_Engine_Linux_64-10.0.0/katalonc \
+          xvfb-run -a $HOME/.katalon/9.0.0/Katalon_Studio_Engine_Linux_64-9.0.0/katalonc \
             -noSplash \
             -runMode="console" \
             -projectPath="${{ github.workspace }}/LMS_B2B_QA_Automation-LK.prj" \
