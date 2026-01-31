@@ -27,7 +27,7 @@ WebUI.navigateToUrl('https://lms-b2b.do.dibimbing.id/')
 
 WebUI.navigateToUrl('https://lms-b2b.do.dibimbing.id/dibimbingqa/login')
 
-WebUI.delay(5)
+WebUI.delay(10)
 
 WebUI.verifyElementPresent(findTestObject('UI/Auth/input_email'), 5)
 
@@ -69,6 +69,8 @@ WebUI.setText(findTestObject('UI/Employee/input-employeeRole'), 'QA Tester')
 WebUI.click(findTestObject('UI/Employee/button-add-employee-submit'))
 
 WebUI.navigateToUrl('https://lms-b2b.do.dibimbing.id/dibimbingqa/admin/employee?tab=1')
+
+WebUI.delay(5)
 
 WebUI.click(findTestObject('UI/Division/add-division-button'))
 

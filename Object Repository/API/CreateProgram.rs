@@ -12,10 +12,10 @@
    <followRedirects>true</followRedirects>
    <httpBody></httpBody>
    <httpBodyContent>{
-  &quot;text&quot;: &quot;{\n  \&quot;query\&quot;: \&quot;mutation CreateProgram($input: ProgramInput!) { createProgram(input: $input) { id } }\&quot;,\n  \&quot;variables\&quot;: \&quot;{ \\\&quot;input\\\&quot;: { \\\&quot;title\\\&quot;: \\\&quot;${title}\\\&quot;, \\\&quot;type\\\&quot;: \\\&quot;training\\\&quot; } }\&quot;\n}&quot;,
+  &quot;text&quot;: &quot;{\n  \&quot;query\&quot;: \&quot;mutation CreateProgram($input: ProgramInput!) { createProgram(input: $input) { id } }\&quot;,\n  \&quot;variables\&quot;: \&quot;{ \\\&quot;input\\\&quot;: { \\\&quot;type\\\&quot;: \\\&quot;${type}\\\&quot;, \\\&quot;title\\\&quot;: \\\&quot;${title}\\\&quot; } }\&quot;\n}&quot;,
   &quot;charset&quot;: &quot;UTF-8&quot;,
   &quot;displayText&quot;: &quot;mutation CreateProgram($input: ProgramInput!) {\n  createProgram(input: $input) {\n    id\n  }\n}\n&quot;,
-  &quot;displayVariables&quot;: &quot;{\n  \&quot;input\&quot;: {\n    \&quot;title\&quot;: \&quot;${title}\&quot;,\n    \&quot;type\&quot;: \&quot;training\&quot;\n  }\n}\n&quot;,
+  &quot;displayVariables&quot;: &quot;{\n  \&quot;input\&quot;: {\n    \&quot;type\&quot;: \&quot;${type}\&quot;,\n    \&quot;title\&quot;: \&quot;${title}\&quot;\n  }\n}\n&quot;,
   &quot;contentType&quot;: &quot;application/json&quot;
 }</httpBodyContent>
    <httpBodyType>GraphQL</httpBodyType>
@@ -32,7 +32,7 @@
       <matchCondition>equals</matchCondition>
       <name>Cookie</name>
       <type>Main</type>
-      <value>sid_b2b=s%3A46WdX-wS_RJB_44986W89ombfm79dtxB.T%2BNL%2BEF07ccge7n1ssQ%2B4MvHq9S0t4vRmG2CmW1dDpE</value>
+      <value>sid_b2b=s%3AyC-N4RnpLGdLH2CrcktqpgOZB6ETrS7P.txuxnTQQFvdlDPzfi%2BGT4mweQXDIabcMyVDLmrrKH5A; __cf_bm=_HdloFO9toPL5jfjbjYUUp3_3.W_07aeBxTQzbgFDts-1769832188-1.0.1.1-cuE8FRwbNsNWFMmn.hM_y13itbkU.WULHPqk9hdABcHAm6I3_X7d4ZWBYUeLd9czuOnfgLSWVWCR9Lz9q9Vt7TZJqsXGfjWY.2hWmCHAg.c</value>
       <webElementGuid>2168da2b-bed8-4656-b13a-19f994cc9218</webElementGuid>
    </httpHeaderProperties>
    <katalonVersion>10.4.2</katalonVersion>

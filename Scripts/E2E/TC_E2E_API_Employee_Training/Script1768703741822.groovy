@@ -1,5 +1,7 @@
 import static com.kms.katalon.core.testobject.ObjectRepository.findTestObject
 import com.kms.katalon.core.webservice.keyword.WSBuiltInKeywords as WS
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 // ======================
 // LOGIN
@@ -13,6 +15,10 @@ WS.verifyResponseStatusCode(loginRes, 200)
 // ======================
 def ts = System.currentTimeMillis()
 
+long startDate = System.currentTimeMillis()
+
+long endDate   = startDate + (5 * 24 * 60 * 60 * 1000) // +5 hari
+
 def email = "dummy_qa_$ts@mail.com"
 
 def name = "Dummy QA $ts"
@@ -24,8 +30,18 @@ String programId
 // ======================
 // CREATE EMPLOYEE
 // ======================
-def empRes = WS.sendRequest(findTestObject('API/CreateEmployee', [('name') : name, ('email') : email, ('username') : email
-            , ('employeeRole') : 'QA Tester', ('phoneNumber') : '08123456789', ('divisionId') : '784d157e-6ea8-4166-8afb-b721fbb0a0e2']))
+def empRes = WS.sendRequest(
+    findTestObject(
+        'API/CreateEmployee',
+        [
+            ('name')         : name,
+            ('email')        : email,
+            ('username')     : email,
+            ('employeeRole') : 'QA Tester',
+            ('phoneNumber')  : '08123456789'
+        ]
+    )
+)
 
 WS.verifyResponseStatusCode(empRes, 200)
 
@@ -36,7 +52,15 @@ assert employeeId != null
 // ======================
 // CREATE PROGRAM
 // ======================
-def progRes = WS.sendRequest(findTestObject('API/CreateProgram', [('type') : 'training', ('title') : "Automation Training $ts"]))
+def progRes = WS.sendRequest(
+    findTestObject(
+        'API/CreateProgram',
+        [
+            ('type')  : 'training',
+            ('title') : "Automation Training $ts"
+        ]
+    )
+)
 
 WS.verifyResponseStatusCode(progRes, 200)
 
@@ -64,7 +88,14 @@ WS.verifyResponseStatusCode(contentRes, 200)
 // ======================
 // ASSIGN PROGRAM (FINAL GOAL)
 // ======================
-def assignRes = WS.sendRequest(findTestObject('API/AssignEmployee'))
+def assignRes = WS.sendRequest(
+    findTestObject('API/AssignEmployee', [
+        ('programId')  : programId,
+        ('employeeId') : employeeId,
+        ('startDate')  : startDate,
+        ('endDate')    : endDate
+    ])
+)
 
 WS.verifyResponseStatusCode(assignRes, 200)
 
