@@ -1,52 +1,40 @@
-name: Katalon CI - Free / KRE
+name: CI - Katalon UI & API (GraphQL)
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
   katalon-test:
-    runs-on: ubuntu-24.04
-    env:
-      JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/11.0.29-7/x64
-      JAVA_HOME_11_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/11.0.29-7/x64
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-    - name: Setup Katalon Studio
-      uses: depapp/free-katalon-studio-github-actions@v2.8.4
-      with:
-        version: 9.6.0 # sesuaikan versi Katalon yang dipakai
-        projectPath: ./LMS_B2B_QA_Automation-LK.prj
-      # env:
-      #   API_KEY: ${{ secrets.KATALON_API_KEY }}  # nanti bisa diaktifkan untuk Enterprise / KRE
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
 
-    # ===========================
-    # Step ini untuk menjalankan test suite
-    # ===========================
-    - name: Run Katalon Tests (KRE)
-      continue-on-error: true  # karena versi free, ini akan memaksa workflow tetap jalan walau lisensi error
-      run: |
-        xvfb-run -a $HOME/.katalon/9.6.0/Katalon_Studio_Engine_Linux_64-9.6.0/katalonc \
-          -noSplash \
-          -runMode="console" \
-          -projectPath="./LMS_B2B_QA_Automation-LK.prj" \
-          -testSuitePath="Test Suites/TS_E2E_All" \
-          -browserType=Firefox \
-          -executionProfile=default \
-          --config -webui.autoUpdateDrivers=true
-      # -apiKey="$API_KEY"  # nanti bisa diaktifkan jika sudah KRE / Enterprise
+      - name: Download Katalon
+        run: |
+          wget -q https://download.katalon.com/9.4.0/Katalon_Studio_Linux_64-9.4.0.tar.gz
+          tar -xzf Katalon_Studio_Linux_64-9.4.0.tar.gz
+          chmod +x Katalon_Studio_Linux_64-9.4.0/katalonc
 
-    # ===========================
-    # Upload reports
-    # ===========================
-    - name: Upload Katalon Reports
-      if: always()  # supaya tetap dijalankan walau test gagal / free version error
-      uses: actions/upload-artifact@v4
-      with:
-        name: katalon-reports
-        path: ./LMS_B2B_QA_Automation-LK.prj/Reports
+      - name: Run Katalon
+        continue-on-error: true
+        run: |
+          ./Katalon_Studio_Linux_64-9.4.0/katalonc \
+            -noSplash \
+            -runMode=console \
+            -projectPath="$GITHUB_WORKSPACE/LMS_B2B_QA_Automation-LK.prj" \
+            -testSuitePath="Test Suites/TS_E2E_All.ts" \
+            -browserType="Firefox (headless)" \
+            -reportFolder="Reports"
+
+      - name: Upload Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: katalon-reports
+          path: Reports/
+          if-no-files-found: ignore
