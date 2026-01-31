@@ -8,7 +8,7 @@ on:
 jobs:
   katalon-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - name: Checkout repository
@@ -20,6 +20,9 @@ jobs:
           distribution: temurin
           java-version: '11'
 
+      - name: Install Xvfb
+        run: sudo apt-get update && sudo apt-get install -y xvfb
+
       - name: Download Katalon Studio Engine
         run: |
           wget -q https://download.katalon.com/9.4.0/Katalon_Studio_Engine_Linux_64-9.4.0.tar.gz
@@ -30,23 +33,28 @@ jobs:
       - name: Prepare Katalon binary
         run: |
           find . -type f -name "katalon" -exec chmod +x {} \;
-          
-      - name: Run Katalon Tests
-        continue-on-error: true
+
+      - name: Run Katalon Tests (Firefox + Xvfb)
         run: |
+          export DISPLAY=:99
+          Xvfb :99 -screen 0 1920x1080x24 &
+
           KATALON_BIN=$(find . -type f -name "katalonc" | head -n 1)
           echo "Using Katalon binary: $KATALON_BIN"
-      
+
           if [ -z "$KATALON_BIN" ]; then
             echo "❌ Katalon binary not found"
             exit 1
           fi
-      
+
           "$KATALON_BIN" \
+            -noSplash \
             -runMode=console \
             -projectPath="$GITHUB_WORKSPACE/LMS_B2B_QA_Automation-LK.prj" \
             -testSuitePath="Test Suites/TS_E2E_All.ts" \
             -browserType="Firefox" \
+            -executionProfile="default" \
+            -consoleLog \
             -reportFolder="Reports"
 
       - name: Upload Katalon Reports
