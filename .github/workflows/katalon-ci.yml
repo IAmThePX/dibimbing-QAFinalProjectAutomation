@@ -58,12 +58,19 @@ jobs:
         run: |
           wget -q https://download.katalon.com/9.4.0/Katalon_Studio_Linux_64-9.4.0.tar.gz
           tar -xzf Katalon_Studio_Linux_64-9.4.0.tar.gz
-
+          
+      - name: Debug Katalon folder
+        run: |
+          ls -la
+          ls -la Katalon_Studio_Linux_64-9.4.0
+          ls -la Katalon_Studio_Linux_64-9.4.0/Katalon_Studio
       # ======================
       # RUN TEST SUITE
       # ======================
       - name: Run Katalon Test Suite (UI + API)
         run: |
+          chmod +x Katalon_Studio_Linux_64-9.4.0/Katalon_Studio/katalonc
+        
           ./Katalon_Studio_Linux_64-9.4.0/katalonc \
             -runMode=console \
             -projectPath="$GITHUB_WORKSPACE/LMS_B2B_QA_Automation-LK.prj" \
