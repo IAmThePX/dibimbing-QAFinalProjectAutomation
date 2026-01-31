@@ -13,28 +13,27 @@ jobs:
 
     steps:
       # ======================
-      # Checkout Repository
+      # Checkout
       # ======================
       - name: Checkout repository
         uses: actions/checkout@v4
 
       # ======================
-      # Setup Java (WAJIB)
+      # Java (Katalon requirement)
       # ======================
       - name: Set up JDK 11
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
+          distribution: 'temurin'
           java-version: '11'
 
       # ======================
-      # Install Firefox (STABLE)
+      # Install Firefox (lebih stabil dari Chrome)
       # ======================
       - name: Install Firefox
         run: |
           sudo apt-get update
           sudo apt-get install -y firefox
-          firefox --version
 
       # ======================
       # Download Katalon Engine
@@ -45,40 +44,43 @@ jobs:
           tar -xzf Katalon_Studio_Engine_Linux_64-9.4.0.tar.gz
 
       # ======================
-      # Locate Katalon Binary (ANTI ERROR)
+      # Make binary executable (ALL POSSIBILITIES)
+      # ======================
+      - name: Make Katalon binaries executable
+        run: |
+          find . -type f \( -name "katalon" -o -name "katalon-engine" -o -name "katalonc" \) -exec chmod +x {} \;
+
+      # ======================
+      # Locate Katalon binary (WITH GUARD)
       # ======================
       - name: Locate Katalon binary
-        id: find-katalon
         run: |
-          KATALON_BIN=$(find . -type f -name "katalon" | head -n 1)
+          KATALON_BIN=$(find . -type f \( -name "katalon" -o -name "katalon-engine" -o -name "katalonc" \) | head -n 1)
+
+          if [ -z "$KATALON_BIN" ]; then
+            echo "❌ Katalon binary not found"
+            find . -maxdepth 3 -type f
+            exit 1
+          fi
+
+          echo "Using Katalon binary: $KATALON_BIN"
           echo "KATALON_BIN=$KATALON_BIN" >> $GITHUB_ENV
-          echo "Found Katalon binary at: $KATALON_BIN"
 
       # ======================
-      # Make Executable
+      # Run Test Suite (UI + API)
       # ======================
-      - name: Make katalon executable
-        run: |
-          chmod +x "$KATALON_BIN"
-
-      # ======================
-      # Run Test Suite
-      # ======================
-      - name: Run Katalon Test Suite (UI + API)
-        continue-on-error: true
+      - name: Run Katalon Test Suite
         run: |
           "$KATALON_BIN" \
-            -noSplash \
             -runMode=console \
             -projectPath="$GITHUB_WORKSPACE/LMS_B2B_QA_Automation-LK.prj" \
             -testSuitePath="Test Suites/TS_E2E_All.ts" \
+            -executionProfile="default" \
             -browserType="Firefox (headless)" \
-            -retry=0 \
-            -statusDelay=15 \
             -reportFolder="Reports"
 
       # ======================
-      # Upload Reports (SELALU)
+      # Upload Reports (Optional)
       # ======================
       - name: Upload Katalon Reports
         if: always()
@@ -86,4 +88,4 @@ jobs:
         with:
           name: katalon-reports
           path: Reports/
-          retention-days: 30
+          retention-days: 14
