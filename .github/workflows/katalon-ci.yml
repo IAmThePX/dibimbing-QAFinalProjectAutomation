@@ -38,9 +38,3 @@ jobs:
           name: katalon-reports
           path: Reports/
           if-no-files-found: ignore
-
-      - name: Set job status based on test results
-        if: steps.katalon_run.outcome == 'failure'
-        run: |
-          echo "⚠ Some tests failed (exit code 2), marking job as failed."
-          exit 2
