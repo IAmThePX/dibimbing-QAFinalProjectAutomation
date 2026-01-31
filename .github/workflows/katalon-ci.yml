@@ -33,11 +33,15 @@ jobs:
           tar -xzf Katalon_Studio_Linux_64-9.4.0.tar.gz
           chmod +x Katalon_Studio_Linux_64-9.4.0/katalonc
 
-      - name: Verify project files
+      - name: Debug project structure
         run: |
           ls -la
-          ls *.prj
-          ls "Test Suites"
+          find . -type f -name "*.prj"
+          find . -type f -name "*.ts"
+
+      - name: Prepare report folder
+        run: |
+          mkdir -p Reports
 
       - name: Run Katalon Test Suite (UI + API)
         run: |
@@ -45,20 +49,19 @@ jobs:
             -noSplash \
             -runMode=console \
             -projectPath="$GITHUB_WORKSPACE/LMS_B2B_QA_Automation-LK.prj" \
-            -testSuitePath="Test Suites/TS_E2E_All" \
+            -testSuitePath="Test Suites/TS_E2E_All.ts" \
             -executionProfile="default" \
-            -browserType="Firefox" \
+            -browserType="Firefox (headless)" \
             -retry=0 \
             -statusDelay=15 \
             -reportFolder="Reports" \
             -reportFileName="E2E_Report" \
             -webui.autoUpdateDrivers=true \
-            -apiKey="${{ secrets.KATALON_API_KEY }}"
 
       - name: Upload Katalon Reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: katalon-reports
-          path: Reports/
+          path: Reports
           retention-days: 30
